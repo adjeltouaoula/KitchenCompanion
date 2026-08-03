@@ -11,17 +11,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
+import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeScreen
+import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeViewModel
 import com.aetherCorp.kitchencompanion.ui.theme.KitchenCompanionTheme
 
 class MainActivity : ComponentActivity() {
+    private val recipeRepository = RecipeRepository()
+    private val recipeFactory = RecipeViewModelFactory(recipeRepository)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             KitchenCompanionTheme {
 
-                    RecipeScreen()
+                    RecipeScreen(recipeFactory)
             }
         }
     }
@@ -30,6 +38,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun ScreenPreview() {
+
     KitchenCompanionTheme {
 
             RecipeScreen()

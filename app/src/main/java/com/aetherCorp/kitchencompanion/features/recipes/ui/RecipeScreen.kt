@@ -14,10 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.aetherCorp.kitchencompanion.core.utils.patesCarbo
+import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 
 @Composable
-fun RecipeScreen(viewModel: RecipeViewModel = viewModel()) {
+fun RecipeScreen(viewModelFactory: RecipeViewModelFactory) {
+    val viewModel: RecipeViewModel = viewModel(factory = viewModelFactory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
