@@ -18,12 +18,6 @@ class RecipeViewModel(
         _uiState.value = RecipeUiState(recipeRepository.getRecipes())
     }
 
-    fun addRecipeClicked(recipe: Recipe) {
-        recipeRepository.addRecipe(recipe)
-
-        updateUiState()
-    }
-
     init {
         updateUiState()
     }

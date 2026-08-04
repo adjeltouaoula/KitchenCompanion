@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
-import com.aetherCorp.kitchencompanion.features.recipes.ui.AddRecipeScreen
+import com.aetherCorp.kitchencompanion.features.addrecipe.ui.AddRecipeScreen
 import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeScreen
 
 @Composable
