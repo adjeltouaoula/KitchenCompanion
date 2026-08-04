@@ -14,7 +14,7 @@ import com.aetherCorp.kitchencompanion.ui.theme.KitchenCompanionTheme
 
 class MainActivity : ComponentActivity() {
 
-     val recipeRepository: RecipeRepository = FakeRecipeRepository()
+    private val recipeRepository: RecipeRepository = FakeRecipeRepository()
     private val recipeFactory = RecipeViewModelFactory(recipeRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KitchenCompanionTheme {
 
-                    RecipeScreen(recipeFactory)
+                RecipeScreen(recipeFactory)
             }
         }
     }
