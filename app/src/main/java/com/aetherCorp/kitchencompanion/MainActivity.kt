@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.aetherCorp.kitchencompanion.core.navigation.AppNavHost
 import com.aetherCorp.kitchencompanion.features.recipes.data.FakeRecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KitchenCompanionTheme {
 
-                RecipeScreen(recipeFactory)
+                AppNavHost(recipeViewModelFactory = recipeFactory)
             }
         }
     }
@@ -35,9 +36,9 @@ class MainActivity : ComponentActivity() {
 fun ScreenPreview() {
     KitchenCompanionTheme {
         RecipeScreen(
-            RecipeViewModelFactory(
-                FakeRecipeRepository()
-            )
+            viewModelFactory = RecipeViewModelFactory(
+                recipeRepository = FakeRecipeRepository()
+            ), onAddRecipeClicked = {}
         )
     }
 }

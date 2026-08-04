@@ -19,7 +19,9 @@ import com.aetherCorp.kitchencompanion.core.utils.patesCarbo
 import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 
 @Composable
-fun RecipeScreen(viewModelFactory: RecipeViewModelFactory) {
+fun RecipeScreen(
+    viewModelFactory: RecipeViewModelFactory,
+    onAddRecipeClicked: () -> Unit) {
     val viewModel: RecipeViewModel = viewModel(factory = viewModelFactory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -44,11 +46,9 @@ fun RecipeScreen(viewModelFactory: RecipeViewModelFactory) {
         }
 
 
-        Button(onClick = {
-            viewModel.addRecipeClicked(
-                patesCarbo
-            )
-        }) {
+        Button(onClick =
+            onAddRecipeClicked
+        ) {
             Text("Ajouter une recette")
         }
     }
