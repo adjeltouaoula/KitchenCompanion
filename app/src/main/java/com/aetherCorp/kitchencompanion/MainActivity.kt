@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.aetherCorp.kitchencompanion.core.navigation.AppNavHost
+import com.aetherCorp.kitchencompanion.features.addrecipe.di.AddRecipeViewModelFactory
 import com.aetherCorp.kitchencompanion.features.recipes.data.FakeRecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
 
     private val recipeRepository: RecipeRepository = FakeRecipeRepository()
     private val recipeFactory = RecipeViewModelFactory(recipeRepository)
+    private val addRecipeFactory = AddRecipeViewModelFactory(recipeRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +27,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             KitchenCompanionTheme {
 
-                AppNavHost(recipeViewModelFactory = recipeFactory)
+                AppNavHost(
+                    recipeViewModelFactory = recipeFactory,
+                    addRecipeViewModelFactory = addRecipeFactory
+                )
             }
         }
     }
