@@ -10,5 +10,4 @@ interface RecipeRepository {
     fun addRecipe(recipe: Recipe): Boolean
     fun deleteRecipe(recipe: Recipe): Boolean
     fun updateRecipe(recipe: Recipe): Boolean
-
 }

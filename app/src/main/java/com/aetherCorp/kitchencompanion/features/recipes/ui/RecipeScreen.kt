@@ -22,6 +22,7 @@ import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactor
 fun RecipeScreen(
     viewModelFactory: RecipeViewModelFactory,
     onAddRecipeClicked: () -> Unit) {
+
     val viewModel: RecipeViewModel = viewModel(factory = viewModelFactory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
