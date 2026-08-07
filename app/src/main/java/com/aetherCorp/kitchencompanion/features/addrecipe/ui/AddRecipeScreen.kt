@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aetherCorp.kitchencompanion.features.addrecipe.di.AddRecipeViewModelFactory
-import com.aetherCorp.kitchencompanion.features.recipes.domain.QuantityUnit
 
 @Composable
 fun AddRecipeScreen(
@@ -32,7 +31,7 @@ fun AddRecipeScreen(
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        viewModel.sharedFlow.collect { event ->
+        viewModel.addRecipeSharedFlow.collect { event ->
             when (event) {
                 is AddRecipeEvent.AddRecipeFailed -> {
                     snackbarHostState.showSnackbar(
@@ -60,7 +59,7 @@ fun AddRecipeScreen(
             modifier = Modifier.padding(padding)
         ) {
 
-            TextField(value = uiState.recipeName, onValueChange = viewModel::onRecipeNameChanges)
+            TextField(value = uiState.recipeName, onValueChange = viewModel::onRecipeNameChanged)
 
             LazyColumn(
                 modifier = Modifier.padding(padding)
@@ -89,14 +88,14 @@ fun AddRecipeScreen(
                         },
                         onUnitChanged = {
                             viewModel.onIngredientUnitChanged(
-                                unit = it ?: QuantityUnit.KG,
+                                unit = it,
                                 ingredientIndex = index
                             )
                         }
                     )
                 }
             }
-            Button(onClick = viewModel::onAddIngredientClicked) {
+            Button(onClick = viewModel::onAddIngredientClicked, enabled = uiState.canAddIngredient) {
                 Text("Ajouter un nouvel ingrédient")
             }
 

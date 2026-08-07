@@ -6,6 +6,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ fun IngredientItem(
     onNameChanged: (name: String) -> Unit,
     onPriceChanged: (price: String) -> Unit,
     onQuantityChanged: (quantity: String) -> Unit,
-    onUnitChanged: (quantityUnit: QuantityUnit?) -> Unit,
+    onUnitChanged: (quantityUnit: QuantityUnit) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -30,7 +31,7 @@ fun IngredientItem(
         Column() {
             with(ingredient) {
                 Row() {
-                    Text("Nom:")
+                    Text("Ingrédient:")
                     TextField(value = name, onValueChange = { newName -> onNameChanged(newName) })
                 }
                 Row() {
@@ -44,39 +45,38 @@ fun IngredientItem(
                     TextField(
                         value = purchaseQuantity,
                         onValueChange = { newQuantity -> onQuantityChanged(newQuantity) })
+                }
+                @OptIn(ExperimentalMaterial3Api::class)
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
 
                     @OptIn(ExperimentalMaterial3Api::class)
-                    ExposedDropdownMenuBox(
+                    TextField(
+                        value = ingredient.purchaseUnit?.name ?: "Choisir une unité",
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor(),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                        onValueChange = {}
+                    )
+
+                    @OptIn(ExperimentalMaterial3Api::class)
+                    ExposedDropdownMenu(
                         expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
+                        onDismissRequest = { expanded = false }
                     ) {
+                        QuantityUnit.entries.forEach { unit ->
 
-                        @OptIn(ExperimentalMaterial3Api::class)
-                        TextField(
-                            value = ingredient.purchaseUnit?.name ?: "",
-                            readOnly = true,
-                            modifier = Modifier.menuAnchor(),
-                            onValueChange = {}
-                        )
-
-                        @OptIn(ExperimentalMaterial3Api::class)
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            QuantityUnit.entries.forEach { unit ->
-
-                                DropdownMenuItem(
-                                    text = { Text(unit.name) },
-                                    onClick = {
-                                        onUnitChanged(unit)
-                                        expanded = false
-                                    }
-                                )
-                            }
+                            DropdownMenuItem(
+                                text = { Text(unit.name) },
+                                onClick = {
+                                    onUnitChanged(unit)
+                                    expanded = false
+                                }
+                            )
                         }
                     }
-
                 }
 
             }
