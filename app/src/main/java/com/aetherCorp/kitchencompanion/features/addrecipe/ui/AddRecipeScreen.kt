@@ -26,13 +26,18 @@ fun AddRecipeScreen(
     onRecipeAdded: () -> Unit,
 ) {
     val viewModel: AddRecipeViewModel = viewModel(factory = viewModelFactory)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val snackbarHostState = remember { SnackbarHostState() }
+
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         viewModel.addRecipeSharedFlow.collect { event ->
+
             when (event) {
+
                 is AddRecipeEvent.AddRecipeFailed -> {
                     snackbarHostState.showSnackbar(
                         message = "La recette n' pas pu être ajoutée !"
@@ -66,29 +71,30 @@ fun AddRecipeScreen(
             ) {
 
                 itemsIndexed(uiState.ingredients) { index, ingredient ->
+
                     IngredientItem(
                         ingredient = ingredient,
-                        onNameChanged = {
+                        onNameChanged = { name ->
                             viewModel.onIngredientNameChanged(
-                                name = it,
+                                name = name,
                                 ingredientIndex = index
                             )
                         },
-                        onPriceChanged = {
+                        onPriceChanged = { price ->
                             viewModel.onIngredientPriceChanged(
-                                price = it,
+                                price = price,
                                 ingredientIndex = index
                             )
                         },
-                        onQuantityChanged = {
+                        onQuantityChanged = { quantity ->
                             viewModel.onIngredientQuantityChanged(
-                                quantityUnit = it,
+                                quantity = quantity,
                                 ingredientIndex = index
                             )
                         },
-                        onUnitChanged = {
+                        onUnitChanged = { unit ->
                             viewModel.onIngredientUnitChanged(
-                                unit = it,
+                                unit = unit,
                                 ingredientIndex = index
                             )
                         }
@@ -101,7 +107,7 @@ fun AddRecipeScreen(
 
             Button(onClick = {
                 focusManager.clearFocus()
-                viewModel.onValidateRecipeNameClicked()
+                viewModel.onValidateRecipeClicked()
             }) {
                 Text("Valider")
             }
