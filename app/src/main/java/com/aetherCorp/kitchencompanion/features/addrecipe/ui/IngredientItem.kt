@@ -32,7 +32,15 @@ fun IngredientItem(
             with(ingredient) {
                 Row() {
                     Text("Ingrédient:")
-                    TextField(value = name, onValueChange = { newName -> onNameChanged(newName) })
+                    TextField(
+                        value = name,
+                        onValueChange = { newName -> onNameChanged(newName) },
+                        isError = showErrors && nameError != null,
+                        supportingText = {
+                            if (showErrors && nameError != null) Text(
+                                nameError
+                            )
+                        })
                 }
                 Row() {
                     Text("Prix:")

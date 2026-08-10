@@ -11,5 +11,7 @@ data class IngredientFormUiState(
     val nameError: String? = null,
     val purchasePriceError: String? = null,
     val purchaseQuantityError: String? = null,
-    val purchaseUnitError: String? = null
+    val purchaseUnitError: String? = null,
+
+    val showErrors: Boolean = false
 )

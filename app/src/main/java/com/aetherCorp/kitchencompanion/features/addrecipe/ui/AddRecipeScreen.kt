@@ -101,7 +101,7 @@ fun AddRecipeScreen(
                     )
                 }
             }
-            Button(onClick = viewModel::onAddIngredientClicked, enabled = uiState.canAddIngredient) {
+            Button(onClick = viewModel::onAddIngredientClicked) {
                 Text("Ajouter un nouvel ingrédient")
             }
 

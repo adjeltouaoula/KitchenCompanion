@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddRecipeViewModel(
@@ -60,19 +59,33 @@ class AddRecipeViewModel(
     // Ingredients
     // -------------------------
 
+
+    // CASE 1 Ingredient list empty -> can add 1
+    // CASE 2 Ingredient is not empty ->
+    // last is valid -> add 1
+    // last is invalid -> show errors
     fun onAddIngredientClicked() {
         val ingredients = _uiState.value.ingredients.toMutableList()
 
-        ingredients.add(
-            IngredientFormUiState()
-        )
+        if (ingredients.isEmpty()) {
+            ingredients.add(IngredientFormUiState())
+        } else {
+            val lastIndex = ingredients.lastIndex
+            val validatedIngredient = validateIngredient(
+                ingredients[lastIndex]
+            )
+
+            if (isIngredientValid(validatedIngredient)) {
+                ingredients.add(IngredientFormUiState())
+            } else {
+                ingredients[lastIndex] = validatedIngredient.copy(
+                    showErrors = true
+                )
+            }
+        }
 
         updateUiState {
-            it.copy(
-                ingredients = ingredients,
-                // The user can't add any new ingredients before completing this one
-                canAddIngredient = false
-            )
+            it.copy(ingredients = ingredients)
         }
     }
 
@@ -113,9 +126,9 @@ class AddRecipeViewModel(
     }
 
 
-    // -------------------------
-    // State updates
-    // -------------------------
+// -------------------------
+// State updates
+// -------------------------
 
     private fun updateUiState(
         update: (AddRecipeUiState) -> AddRecipeUiState
@@ -138,16 +151,15 @@ class AddRecipeViewModel(
 
         updateUiState {
             it.copy(
-                ingredients = ingredients,
-                canAddIngredient = canAddIngredient(ingredients)
+                ingredients = ingredients
             )
         }
     }
 
 
-    // -------------------------
-    // Validation
-    // -------------------------
+// -------------------------
+// Validation
+// -------------------------
 
     private fun validateIngredient(
         ingredient: IngredientFormUiState
@@ -207,23 +219,16 @@ class AddRecipeViewModel(
             nameError = nameError,
             purchasePriceError = priceError,
             purchaseQuantityError = quantityError,
-            purchaseUnitError = unitError
+            purchaseUnitError = unitError,
         )
     }
 
-    private fun canAddIngredient(
-        ingredients: List<IngredientFormUiState>
+    private fun isIngredientValid(
+        ingredient: IngredientFormUiState
     ): Boolean {
-
-        if (ingredients.isEmpty()) {
-            return true
-        }
-
-        val lastIngredient = ingredients.last()
-
-        return lastIngredient.nameError == null &&
-                lastIngredient.purchasePriceError == null &&
-                lastIngredient.purchaseQuantityError == null &&
-                lastIngredient.purchaseUnitError == null
+        return ingredient.nameError == null &&
+                ingredient.purchasePriceError == null &&
+                ingredient.purchaseQuantityError == null &&
+                ingredient.purchaseUnitError == null
     }
 }
