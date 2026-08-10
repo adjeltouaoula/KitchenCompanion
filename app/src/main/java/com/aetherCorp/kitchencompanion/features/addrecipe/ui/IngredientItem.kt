@@ -46,13 +46,23 @@ fun IngredientItem(
                     Text("Prix:")
                     TextField(
                         value = purchasePrice,
-                        onValueChange = { newPrice -> onPriceChanged(newPrice) })
+                        onValueChange = { newPrice -> onPriceChanged(newPrice) },
+                        isError = showErrors && purchasePriceError != null,
+                        supportingText = {
+                            if (showErrors && purchasePriceError != null) Text(purchasePriceError)
+                        })
                 }
                 Row() {
                     Text("Quantité:")
                     TextField(
                         value = purchaseQuantity,
-                        onValueChange = { newQuantity -> onQuantityChanged(newQuantity) })
+                        onValueChange = { newQuantity -> onQuantityChanged(newQuantity) },
+                        isError = showErrors && purchaseQuantityError != null,
+                        supportingText = {
+                            if (showErrors && purchaseQuantityError != null) Text(
+                                purchaseQuantityError
+                            )
+                        })
                 }
                 @OptIn(ExperimentalMaterial3Api::class)
                 ExposedDropdownMenuBox(
@@ -66,7 +76,11 @@ fun IngredientItem(
                         readOnly = true,
                         modifier = Modifier.menuAnchor(),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                        onValueChange = {}
+                        onValueChange = {},
+                        isError = showErrors && purchaseUnitError != null,
+                        supportingText = {
+                            if (showErrors && purchaseUnitError != null) Text(purchaseUnitError)
+                        }
                     )
 
                     @OptIn(ExperimentalMaterial3Api::class)
