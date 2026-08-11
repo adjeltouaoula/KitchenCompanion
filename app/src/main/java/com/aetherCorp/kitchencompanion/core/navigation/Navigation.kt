@@ -11,8 +11,7 @@ import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeScreen
 
 @Composable
 fun AppNavHost(
-    recipeViewModelFactory: RecipeViewModelFactory,
-    addRecipeViewModelFactory: AddRecipeViewModelFactory
+    recipeViewModelFactory: RecipeViewModelFactory
 ) {
 
     val navController = rememberNavController()
@@ -27,7 +26,6 @@ fun AppNavHost(
         }
         composable<AddRecipeRoute> {
             AddRecipeScreen(
-                viewModelFactory = addRecipeViewModelFactory,
                 onRecipeAdded = {
                     navController.popBackStack()
                 }
