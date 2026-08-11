@@ -1,10 +1,11 @@
 package com.aetherCorp.kitchencompanion.features.recipes.data
 
 import com.aetherCorp.kitchencompanion.features.recipes.domain.Recipe
+import javax.inject.Inject
 import kotlin.collections.contains
 import kotlin.collections.remove
 
-class FakeRecipeRepository: RecipeRepository {
+class FakeRecipeRepository @Inject constructor(): RecipeRepository {
     private val fakeRecipes: MutableList<Recipe> = mutableListOf()
 
     override fun getRecipe(recipeId: Long): Recipe? {
