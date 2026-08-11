@@ -10,6 +10,7 @@ import com.aetherCorp.kitchencompanion.features.recipes.domain.RecipeIngredient
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +21,7 @@ class AddRecipeViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddRecipeUiState())
-    val uiState: SharedFlow<AddRecipeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<AddRecipeUiState> = _uiState.asStateFlow()
 
     private val _addRecipeSharedFlow = MutableSharedFlow<AddRecipeEvent>()
     val addRecipeSharedFlow: SharedFlow<AddRecipeEvent> =
