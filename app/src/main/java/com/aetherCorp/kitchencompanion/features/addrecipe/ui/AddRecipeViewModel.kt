@@ -10,7 +10,6 @@ import com.aetherCorp.kitchencompanion.features.recipes.domain.RecipeIngredient
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,93 +20,70 @@ class AddRecipeViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddRecipeUiState())
-    val uiState: StateFlow<AddRecipeUiState> = _uiState.asStateFlow()
+    val uiState: SharedFlow<AddRecipeUiState> = _uiState.asStateFlow()
 
     private val _addRecipeSharedFlow = MutableSharedFlow<AddRecipeEvent>()
     val addRecipeSharedFlow: SharedFlow<AddRecipeEvent> =
         _addRecipeSharedFlow.asSharedFlow()
 
 
-    // -------------------------
+    // --------------------------------------------------
     // Recipe
-    // -------------------------
+    // --------------------------------------------------
 
     fun onRecipeNameChanged(name: String) {
-        updateUiState {
-            it.copy(recipeName = name)
+        _uiState.update {
+            it.copy(
+                recipeName = name,
+                showError = false
+            )
         }
     }
 
     fun onValidateRecipeClicked() {
 
-        if (isRecipeNameValid() && areAllIngredientsValid()) {
+        val recipeNameValid = validateRecipeName()
+        val ingredientsValid = validateAllIngredients()
 
-            val ingredients = _uiState.value.ingredients.map { ingredient ->
-                with(ingredient) {
+        if (!recipeNameValid || !ingredientsValid) {
+            return
+        }
 
-                    RecipeIngredient(
-                        ingredient = Ingredient(
-                            name = name,
-                            purchasePrice = purchasePrice.toDouble(),
-                            purchaseQuantity = purchaseQuantity.toDouble(),
-                            purchaseUnit = purchaseUnit!!
-                        ),
-                        quantity = purchaseQuantity.toDouble(),
-                        unit = purchaseUnit
-                    )
+        val recipe = buildRecipe()
+
+        viewModelScope.launch {
+            val event =
+                if (recipeRepository.addRecipe(recipe)) {
+                    AddRecipeEvent.RecipeAdded
+                } else {
+                    AddRecipeEvent.AddRecipeFailed
                 }
-            }
 
-            val recipe = Recipe(
-                id = 1,
-                name = _uiState.value.recipeName,
-                ingredients = ingredients
-            )
-
-            viewModelScope.launch {
-                _addRecipeSharedFlow.emit(
-                    if (recipeRepository.addRecipe(recipe)) {
-                        AddRecipeEvent.RecipeAdded
-                    } else {
-                        AddRecipeEvent.AddRecipeFailed
-                    }
-                )
-            }
+            _addRecipeSharedFlow.emit(event)
         }
     }
 
 
-    // -------------------------
+    // --------------------------------------------------
     // Ingredients
-    // -------------------------
+    // --------------------------------------------------
 
-
-    // CASE 1 Ingredient list empty -> can add 1
-    // CASE 2 Ingredient is not empty ->
-    // last is valid -> add 1
-    // last is invalid -> show errors
     fun onAddIngredientClicked() {
-        val ingredients = _uiState.value.ingredients.toMutableList()
 
-        if (ingredients.isEmpty()) {
-            ingredients.add(IngredientFormUiState())
-        } else {
-            val lastIndex = ingredients.lastIndex
-            val validatedIngredient = validateIngredient(
-                ingredients[lastIndex]
-            )
-
-            if (isIngredientValid(validatedIngredient)) {
-                ingredients.add(IngredientFormUiState())
-            } else {
-                ingredients[lastIndex] = validatedIngredient.copy(
-                    showErrors = true
-                )
-            }
+        if (_uiState.value.ingredients.isEmpty()) {
+            addEmptyIngredient()
+            return
         }
 
-        updateUiState {
-            it.copy(ingredients = ingredients)
+        val lastIngredient = _uiState.value.ingredients.last()
+        val validatedIngredient = validateIngredient(lastIngredient)
+
+        if (isIngredientValid(validatedIngredient)) {
+            addEmptyIngredient()
+        } else {
+            updateLastIngredient(
+                validatedIngredient.copy(showErrors = true)
+            )
         }
     }
 
@@ -148,62 +124,101 @@ class AddRecipeViewModel(
     }
 
 
-// -------------------------
-// State updates
-// -------------------------
+    // --------------------------------------------------
+    // State updates
+    // --------------------------------------------------
 
-    private fun updateUiState(
-        update: (AddRecipeUiState) -> AddRecipeUiState
-    ) {
-        _uiState.value = update(_uiState.value)
+    private fun addEmptyIngredient() {
+        _uiState.update {
+            it.copy(
+                ingredients = it.ingredients + IngredientFormUiState()
+            )
+        }
     }
 
     private fun updateIngredient(
         ingredientIndex: Int,
         update: (IngredientFormUiState) -> IngredientFormUiState
     ) {
-        val ingredients = _uiState.value.ingredients.toMutableList()
+        _uiState.update { state ->
 
-        val updatedIngredient = update(
-            ingredients[ingredientIndex]
-        )
+            val ingredients = state.ingredients.toMutableList()
 
-        ingredients[ingredientIndex] =
-            validateIngredient(updatedIngredient)
+            val updatedIngredient =
+                update(ingredients[ingredientIndex])
 
-        updateUiState {
-            it.copy(
+            ingredients[ingredientIndex] =
+                validateIngredient(updatedIngredient)
+
+            state.copy(
+                ingredients = ingredients
+            )
+        }
+    }
+
+    private fun updateLastIngredient(
+        ingredient: IngredientFormUiState
+    ) {
+        _uiState.update { state ->
+
+            val ingredients = state.ingredients.toMutableList()
+
+            ingredients[ingredients.lastIndex] = ingredient
+
+            state.copy(
                 ingredients = ingredients
             )
         }
     }
 
 
-    // -------------------------
-// Validation
-// -------------------------
-    private fun isRecipeNameValid(): Boolean {
+    // --------------------------------------------------
+    // Validation
+    // --------------------------------------------------
+
+    private fun validateRecipeName(): Boolean {
+
         val isValid = _uiState.value.recipeName.isNotBlank()
 
         _uiState.update {
-            it.copy(showError = !isValid)
+            it.copy(
+                showError = !isValid
+            )
         }
 
         return isValid
     }
 
-    private fun areAllIngredientsValid(): Boolean {
-        for (ingredient in _uiState.value.ingredients) {
-            val testedIngredient = validateIngredient(ingredient)
-            if (!isIngredientValid(testedIngredient)) {
+    private fun validateAllIngredients(): Boolean {
 
-                return false
-            }
+        var allValid = true
+
+        _uiState.update { state ->
+
+            val validatedIngredients =
+                state.ingredients.map { ingredient ->
+
+                    val validatedIngredient =
+                        validateIngredient(ingredient)
+
+                    if (!isIngredientValid(validatedIngredient)) {
+                        allValid = false
+                    }
+
+                    validatedIngredient.copy(
+                        showErrors = true
+                    )
+                }
+
+            state.copy(
+                ingredients = validatedIngredients
+            )
         }
-        return true
+
+        return allValid
     }
 
-    fun validateIngredient(
+    private fun validateIngredient(
         ingredient: IngredientFormUiState
     ): IngredientFormUiState {
 
@@ -261,7 +276,7 @@ class AddRecipeViewModel(
             nameError = nameError,
             purchasePriceError = priceError,
             purchaseQuantityError = quantityError,
-            purchaseUnitError = unitError,
+            purchaseUnitError = unitError
         )
     }
 
@@ -272,5 +287,33 @@ class AddRecipeViewModel(
                 ingredient.purchasePriceError == null &&
                 ingredient.purchaseQuantityError == null &&
                 ingredient.purchaseUnitError == null
+    }
+
+
+    // --------------------------------------------------
+    // Recipe creation
+    // --------------------------------------------------
+
+    private fun buildRecipe(): Recipe {
+
+        val ingredients = _uiState.value.ingredients.map { ingredient ->
+
+            RecipeIngredient(
+                ingredient = Ingredient(
+                    name = ingredient.name,
+                    purchasePrice = ingredient.purchasePrice.toDouble(),
+                    purchaseQuantity = ingredient.purchaseQuantity.toDouble(),
+                    purchaseUnit = ingredient.purchaseUnit!!
+                ),
+                quantity = ingredient.purchaseQuantity.toDouble(),
+                unit = ingredient.purchaseUnit
+            )
+        }
+
+        return Recipe(
+            id = 1,
+            name = _uiState.value.recipeName.trim(),
+            ingredients = ingredients
+        )
     }
 }
