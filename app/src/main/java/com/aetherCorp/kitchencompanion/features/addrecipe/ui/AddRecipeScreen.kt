@@ -64,7 +64,10 @@ fun AddRecipeScreen(
             modifier = Modifier.padding(padding)
         ) {
 
-            TextField(value = uiState.recipeName, onValueChange = viewModel::onRecipeNameChanged)
+            TextField(value = uiState.recipeName, onValueChange = viewModel::onRecipeNameChanged,
+                isError = uiState.showError, supportingText = {
+                    if (uiState.showError) Text("Le nom de la recette ne doit pas être vide")
+                })
 
             LazyColumn(
                 modifier = Modifier.padding(padding)
