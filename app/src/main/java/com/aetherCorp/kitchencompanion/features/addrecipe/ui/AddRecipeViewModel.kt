@@ -3,14 +3,17 @@ package com.aetherCorp.kitchencompanion.features.addrecipe.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
+import com.aetherCorp.kitchencompanion.features.recipes.domain.Ingredient
 import com.aetherCorp.kitchencompanion.features.recipes.domain.QuantityUnit
 import com.aetherCorp.kitchencompanion.features.recipes.domain.Recipe
+import com.aetherCorp.kitchencompanion.features.recipes.domain.RecipeIngredient
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddRecipeViewModel(
@@ -36,21 +39,40 @@ class AddRecipeViewModel(
     }
 
     fun onValidateRecipeClicked() {
-        val recipe = Recipe(
-            // TODO: fake id, will change
-            id = 1,
-            name = _uiState.value.recipeName,
-            ingredients = emptyList()
-        )
 
-        viewModelScope.launch {
-            _addRecipeSharedFlow.emit(
-                if (recipeRepository.addRecipe(recipe)) {
-                    AddRecipeEvent.RecipeAdded
-                } else {
-                    AddRecipeEvent.AddRecipeFailed
+        if (isRecipeNameValid() && areAllIngredientsValid()) {
+
+            val ingredients = _uiState.value.ingredients.map { ingredient ->
+                with(ingredient) {
+
+                    RecipeIngredient(
+                        ingredient = Ingredient(
+                            name = name,
+                            purchasePrice = purchasePrice.toDouble(),
+                            purchaseQuantity = purchaseQuantity.toDouble(),
+                            purchaseUnit = purchaseUnit!!
+                        ),
+                        quantity = purchaseQuantity.toDouble(),
+                        unit = purchaseUnit
+                    )
                 }
+            }
+
+            val recipe = Recipe(
+                id = 1,
+                name = _uiState.value.recipeName,
+                ingredients = ingredients
             )
+
+            viewModelScope.launch {
+                _addRecipeSharedFlow.emit(
+                    if (recipeRepository.addRecipe(recipe)) {
+                        AddRecipeEvent.RecipeAdded
+                    } else {
+                        AddRecipeEvent.AddRecipeFailed
+                    }
+                )
+            }
         }
     }
 
@@ -157,11 +179,31 @@ class AddRecipeViewModel(
     }
 
 
-// -------------------------
+    // -------------------------
 // Validation
 // -------------------------
+    private fun isRecipeNameValid(): Boolean {
+        val isValid = _uiState.value.recipeName.isNotBlank()
 
-    private fun validateIngredient(
+        _uiState.update {
+            it.copy(showError = !isValid)
+        }
+
+        return isValid
+    }
+
+    private fun areAllIngredientsValid(): Boolean {
+        for (ingredient in _uiState.value.ingredients) {
+            val testedIngredient = validateIngredient(ingredient)
+            if (!isIngredientValid(testedIngredient)) {
+
+                return false
+            }
+        }
+        return true
+    }
+
+    fun validateIngredient(
         ingredient: IngredientFormUiState
     ): IngredientFormUiState {
 
