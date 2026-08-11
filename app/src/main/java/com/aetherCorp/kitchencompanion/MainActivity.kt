@@ -30,8 +30,7 @@ class MainActivity : ComponentActivity() {
             KitchenCompanionTheme {
 
                 AppNavHost(
-                    recipeViewModelFactory = recipeFactory,
-                    addRecipeViewModelFactory = addRecipeFactory
+                    recipeViewModelFactory = recipeFactory
                 )
             }
         }
