@@ -13,7 +13,9 @@ import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeScreen
 import com.aetherCorp.kitchencompanion.ui.theme.KitchenCompanionTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val recipeRepository: RecipeRepository = FakeRecipeRepository()
