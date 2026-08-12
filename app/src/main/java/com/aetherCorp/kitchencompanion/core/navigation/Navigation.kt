@@ -4,22 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aetherCorp.kitchencompanion.features.addrecipe.di.AddRecipeViewModelFactory
 import com.aetherCorp.kitchencompanion.features.addrecipe.ui.AddRecipeScreen
-import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 import com.aetherCorp.kitchencompanion.features.recipes.ui.RecipeScreen
 
 @Composable
-fun AppNavHost(
-    recipeViewModelFactory: RecipeViewModelFactory
-) {
+fun AppNavHost() {
 
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = RecipeRoute) {
         composable<RecipeRoute> {
             RecipeScreen(
-                viewModelFactory = recipeViewModelFactory,
                 onAddRecipeClicked = {
                     navController.navigate(AddRecipeRoute)
                 })

@@ -12,18 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.aetherCorp.kitchencompanion.core.utils.patesCarbo
-import com.aetherCorp.kitchencompanion.features.recipes.di.RecipeViewModelFactory
 
 @Composable
 fun RecipeScreen(
-    viewModelFactory: RecipeViewModelFactory,
     onAddRecipeClicked: () -> Unit) {
 
-    val viewModel: RecipeViewModel = viewModel(factory = viewModelFactory)
+    val viewModel: RecipeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(

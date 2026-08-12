@@ -3,11 +3,14 @@ package com.aetherCorp.kitchencompanion.features.recipes.ui
 import androidx.lifecycle.ViewModel
 import com.aetherCorp.kitchencompanion.features.recipes.data.RecipeRepository
 import com.aetherCorp.kitchencompanion.features.recipes.domain.Recipe
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
-class RecipeViewModel(
+@HiltViewModel
+class RecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository
 ) : ViewModel() {
 
