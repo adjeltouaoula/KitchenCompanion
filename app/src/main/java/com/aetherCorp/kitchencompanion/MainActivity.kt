@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
 
     private val recipeRepository: RecipeRepository = FakeRecipeRepository()
     private val recipeFactory = RecipeViewModelFactory(recipeRepository)
-    private val addRecipeFactory = AddRecipeViewModelFactory(recipeRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
