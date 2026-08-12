@@ -7,6 +7,7 @@ import com.aetherCorp.kitchencompanion.features.recipes.domain.Ingredient
 import com.aetherCorp.kitchencompanion.features.recipes.domain.QuantityUnit
 import com.aetherCorp.kitchencompanion.features.recipes.domain.Recipe
 import com.aetherCorp.kitchencompanion.features.recipes.domain.RecipeIngredient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,8 +16,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddRecipeViewModel(
+@HiltViewModel
+class AddRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository
 ) : ViewModel() {
 

@@ -17,15 +17,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.aetherCorp.kitchencompanion.features.addrecipe.di.AddRecipeViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun AddRecipeScreen(
-    viewModelFactory: AddRecipeViewModelFactory,
     onRecipeAdded: () -> Unit,
 ) {
-    val viewModel: AddRecipeViewModel = viewModel(factory = viewModelFactory)
+    val viewModel: AddRecipeViewModel = hiltViewModel()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
